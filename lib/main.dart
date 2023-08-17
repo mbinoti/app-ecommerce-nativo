@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'product_grid_view.dart';
-import 'produto.dart';
 
 void main() {
   runApp(const MainApp());
