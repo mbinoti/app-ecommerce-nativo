@@ -1,3 +1,4 @@
 # ecommerce_app
 
-A new Flutter project.
+app ecommerce usando gerenciamento de estado nativo do flutter.
+
