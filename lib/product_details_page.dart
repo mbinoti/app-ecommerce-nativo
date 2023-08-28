@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'cart_controller.dart';
+
 import 'produto.dart';
 
 class ProductDetailsPage extends StatefulWidget {
@@ -12,8 +14,10 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
-  int quantity = 1;
-  ValueNotifier<List<ItemCart>> cart = ValueNotifier<List<ItemCart>>([]);
+  ValueNotifier<int> quantity = ValueNotifier<int>(1);
+
+  // int quantity = 1;
+  final CartController cartController = CartController();
 
   @override
   Widget build(BuildContext context) {
@@ -21,58 +25,89 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       appBar: AppBar(
         title: Text(widget.produto.nome),
       ),
-      body: Column(
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(widget.produto.imagem),
-          Text(widget.produto.nome),
-          Text('\$${widget.produto.preco.toStringAsFixed(2)}'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove),
-                onPressed: () {
-                  if (quantity > 1) {
-                    setState(() {
-                      quantity--;
-                    });
-                  }
-                },
-              ),
-              Text('$quantity'),
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  setState(() {
-                    quantity++;
-                  });
-                },
-              ),
-            ],
+          SizedBox(
+            height: 180,
+            width: 180,
+            child: Image.asset(widget.produto.imagem),
           ),
-          ElevatedButton(
-            onPressed: () {
-              List<ItemCart> updatedCartItems =
-                  List.from(cart.value); // Cria uma cópia da lista atual
-              updatedCartItems.add(ItemCart(
-                  produto: widget.produto,
-                  quantidade:
-                      quantity)); // Adicione o novo item à lista copiada
-
-              cart.value =
-                  updatedCartItems; // Atribua a lista atualizada ao ValueNotifier
-            },
-            child: const Text("Adicionar ao Carrinho"),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.produto.nome, style: const TextStyle(fontSize: 8)),
+                const SizedBox(height: 10),
+                const Divider(color: Colors.black26, height: 0, thickness: 0),
+                const SizedBox(height: 10),
+                Text(
+                  '\$${widget.produto.preco.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 8),
+                ),
+                const SizedBox(height: 10),
+                const Divider(color: Colors.black26, height: 1, thickness: 0),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text('quantidade:', style: TextStyle(fontSize: 8)),
+                    const SizedBox(width: 30),
+                    IntrinsicWidth(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(60)),
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: () {
+                                quantity.value--;
+                              },
+                            ),
+                            ValueListenableBuilder<int>(
+                              valueListenable: quantity,
+                              builder: (context, value, _) {
+                                return Text('$value');
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () {
+                                quantity.value++;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Divider(color: Colors.black26, height: 1, thickness: 0),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                    ),
+                    onPressed: () {
+                      cartController.addToCart(widget.produto, quantity.value);
+                    },
+                    child: const Text("Adicionar ao Carrinho",
+                        style: TextStyle(fontSize: 8)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
-}
-
-class ItemCart {
-  final Produto produto;
-  int quantidade;
-
-  ItemCart({required this.produto, required this.quantidade});
 }

@@ -1,34 +1,46 @@
 import 'package:flutter/material.dart';
 
-import 'product_details_page.dart';
+import 'item_cart.dart';
 import 'produto.dart';
 
 class CartController {
   ValueNotifier<List<ItemCart>> cartItems = ValueNotifier<List<ItemCart>>([]);
-  void addToCart(Produto produto, int quantidade) {
-    final existingItem = cartItems.value.firstWhere(
-      (item) => item.produto.nome == produto.nome,
-      orElse: () => ItemCart(
-          produto: produto,
-          quantidade: 0), // Aqui nós criamos um novo ItemCart com quantidade 0.
-    );
 
-    if (existingItem.quantidade == 0) {
-      // Se é o novo ItemCart que nós criamos anteriormente
-      existingItem.quantidade = quantidade;
-      cartItems.value.add(existingItem);
+  // Singleton setup
+  static final CartController _singleton = CartController._internal();
+  factory CartController() {
+    return _singleton;
+  }
+  CartController._internal();
+
+  void addToCart(Produto produto, int quantity) {
+    List<ItemCart> updatedCartItems = List.from(cartItems.value);
+    var itemIndex = updatedCartItems
+        .indexWhere((item) => item.produto.nome == produto.nome);
+
+    if (itemIndex >= 0) {
+      updatedCartItems[itemIndex].quantidade += quantity;
     } else {
-      existingItem.quantidade += quantidade;
+      updatedCartItems.add(ItemCart(produto: produto, quantidade: quantity));
     }
 
-    cartItems.notifyListeners();
+    cartItems.value = updatedCartItems;
   }
 
   void removeFromCart(Produto produto) {
-    // Implemente a lógica para remover um item do carrinho
+    cartItems.value.removeWhere((item) => item.produto.nome == produto.nome);
+    cartItems.notifyListeners();
   }
 
-  void updateQuantity(Produto produto, int quantidade) {
-    // Implemente a lógica para atualizar a quantidade de um item no carrinho
+  void updateQuantity(Produto produto, int quantity) {
+    List<ItemCart> updatedCartItems = List.from(cartItems.value);
+    var itemIndex = updatedCartItems
+        .indexWhere((item) => item.produto.nome == produto.nome);
+
+    if (itemIndex >= 0) {
+      updatedCartItems[itemIndex].quantidade = quantity;
+    } // Não precisamos fazer nada se o produto não estiver no carrinho.
+
+    cartItems.value = updatedCartItems;
   }
 }

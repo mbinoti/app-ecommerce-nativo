@@ -1,6 +1,12 @@
 import 'package:ecommerce_app/produto.dart';
 import 'package:flutter/material.dart';
 
+import 'CartIconWidget.dart';
+import 'cart_controller.dart';
+import 'cart_page.dart';
+import 'item_cart.dart';
+import 'product_details_page.dart';
+
 class ProductGridView extends StatelessWidget {
   // Exemplo de lista de produtos.
   final List<Produto> produtos = [
@@ -76,6 +82,7 @@ class ProductGridView extends StatelessWidget {
         imagem: "assets/images/bruschetta-plate.jpg"),
   ];
   final cartItemCount = ValueNotifier<int>(0);
+  final CartController cartController = CartController();
 
   @override
   Widget build(BuildContext context) {
@@ -83,82 +90,37 @@ class ProductGridView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Produtos'),
         actions: [
-          ValueListenableBuilder<int>(
-            valueListenable: cartItemCount,
-            builder: (context, value, child) {
-              return Container(
-                width: 60,
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: IconButton(
-                        onPressed: () {
-                          cartItemCount.value++;
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const CartPage(),
-                          //   ),
-                          // );
-                        },
-                        icon: const Icon(Icons.shopping_cart),
-                      ),
-                    ),
-                    Positioned(
-                      right: 10,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        child: Text(
-                          '$value',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+          CartIconWidget(cartController: cartController),
           IconButton(
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const CartPage(),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartPage(),
+                  ),
+                );
               },
               icon: const Icon(Icons.login)),
         ],
       ),
-      body: OrientationBuilder(
-        builder: (context, orientation) {
-          return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: (orientation == Orientation.portrait) ? 2 : 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: produtos.length,
-            itemBuilder: (context, index) {
-              return ProductItem(produto: produtos[index]);
-            },
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: OrientationBuilder(
+          builder: (context, orientation) {
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: (orientation == Orientation.portrait) ? 2 : 3,
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 15,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: produtos.length,
+              itemBuilder: (context, index) {
+                return ProductItem(produto: produtos[index]);
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -171,85 +133,66 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(0, 5),
-                  blurRadius: 10,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsPage(produto: produto),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        margin: const EdgeInsets.all(1.0), // margem aumentada
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 4, // Maior proporção para a imagem
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
                 ),
-              ],
+                child: Image.asset(
+                  // color: Colors.white,
+                  produto.imagem,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-            child: Stack(
-              children: [
-                myCard(context, produto),
-                Positioned(
-                  child: Text(
-                    produto.nome,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+              child: Text(
+                produto.nome,
+                style: TextStyle(
+                  fontSize: 12, // Fonte reduzida
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(1.0),
-                    color: const Color.fromARGB(255, 102, 102, 100)
-                        .withOpacity(0.5), // Just for visibility
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'R\$ ${produto.preco.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            // fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          '${produto.quantidade} unidades',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            // fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          );
-        },
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+              child: Text(
+                'R\$ ${produto.preco.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 11, // Fonte reduzida
+                  color: Colors.teal,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
-
-Widget myCard(BuildContext context, Produto produto) {
-  return Column(
-    children: [
-      SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Image.asset(
-          produto.imagem,
-          fit: BoxFit.cover,
-        ),
-      )
-    ],
-  );
 }
