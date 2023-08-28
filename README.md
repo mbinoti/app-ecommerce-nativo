@@ -1,7 +1,7 @@
 # ecommerce_app
 
-app ecommerce usando gerenciamento de estado nativo do flutter.
+app ecommerce e gerenciamento de estado nativo flutter.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/6609513/261380846-f992451c-1b6c-44e8-936a-02d6d9be8ab4.jpg" width="300">
+  <img src="https://user-images.githubusercontent.com/6609513/263815044-299adaf8-f837-496d-8a3f-f65c1f949f65.mp4" width="300">
 </p>

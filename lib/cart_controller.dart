@@ -29,7 +29,7 @@ class CartController {
 
   void removeFromCart(Produto produto) {
     cartItems.value.removeWhere((item) => item.produto.nome == produto.nome);
-    // cartItems.notifyListeners();
+    cartItems.notifyListeners();
   }
 
   void updateQuantity(Produto produto, int quantity) {
