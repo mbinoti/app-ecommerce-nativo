@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class Produto {
   String nome;
   double preco;

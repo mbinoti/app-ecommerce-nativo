@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'CartIconWidget.dart';
 import 'cart_controller.dart';
 import 'cart_page.dart';
-import 'item_cart.dart';
+
 import 'product_details_page.dart';
 
 class ProductGridView extends StatelessWidget {
