@@ -29,6 +29,7 @@ class CartController {
 
   void removeFromCart(Produto produto) {
     cartItems.value.removeWhere((item) => item.produto.nome == produto.nome);
+    // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
     cartItems.notifyListeners();
   }
 
